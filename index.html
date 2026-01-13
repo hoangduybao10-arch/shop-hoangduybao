@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Store - Hoang Duy Bao</title>
+    <style>
+        /* --- CSS Reset & Basics --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            padding-top: 70px; /* Prevent Header overlap */
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .cart-info {
+            background-color: #e74c3c;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .cart-info:hover {
+            background-color: #c0392b;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h2.section-title {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2c3e50;
+            text-transform: uppercase;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        /* --- Product Grid --- */
+        .product-grid {
+            display: grid;
+            /* Auto columns: min 250px, fill remaining space */
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        /* --- Product Card --- */
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+
+        .product-details {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .product-price {
+            font-size: 1.2rem;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .btn-add {
+            margin-top: auto; /* Push button to bottom */
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .btn-add:hover {
+            background-color: #2980b9;
+        }
+
+        /* --- Toast Notification --- */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2000;
+        }
+
+        .toast {
+            background-color: #2ecc71;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            animation: fadeIn 0.3s, fadeOut 0.3s 2.5s forwards;
+            min-width: 250px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(20px); }
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            background-color: #fff;
+            color: #7f8c8d;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">Hoang Duy Bao</div>
+        <div class="cart-info" onclick="alert('Cart feature is coming soon!')">
+            Cart: <span id="cart-count">0</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h2 class="section-title">Latest Products</h2>
+        
+        <!-- Product List Container -->
+        <div class="product-grid" id="product-list">
+            <!-- Products will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2024 Hoang Duy Bao. All rights reserved.
+    </footer>
+
+    <script>
+        // 1. Product Data (Array of Objects)
+        // Images from Pexels
+        const products = [
+            {
+                id: 1,
+                name: "iPhone 15 Pro Max",
+                price: 34990000,
+                image: "https://images.pexels.com/photos/1294886/pexels-photo-1294886.jpeg?auto=compress&cs=tinysrgb&w=600"
+            },
+            {
+                id: 2,
+                name: "Samsung Galaxy S24 Ultra",
+                price: 31990000,
+                image: "https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&w=600"
+            },
+            {
+                id: 3,
+                name: "MacBook Air M3 13 inch",
+                price: 27990000,
+                image: "https://images.pexels.com/photos/303383/pexels-photo-303383.jpeg?auto=compress&cs=tinysrgb&w=600"
+            },
+            {
+                id: 4,
+                name: "Sony WH-1000XM5 Headphones",
+                price: 6490000,
+                image: "https://images.pexels.com/photos/1649771/pexels-photo-1649771.jpeg?auto=compress&cs=tinysrgb&w=600"
+            },
+            {
+                id: 5,
+                name: "Keychron Q1 Mechanical Keyboard",
+                price: 3890000,
+                image: "https://images.pexels.com/photos/841228/pexels-photo-841228.jpeg?auto=compress&cs=tinysrgb&w=600"
+            },
+            {
+                id: 6,
+                name: "Logitech MX Master 3S Mouse",
+                price: 2190000,
+                image: "https://images.pexels.com/photos/5082579/pexels-photo-5082579.jpeg?auto=compress&cs=tinysrgb&w=600"
+            },
+            {
+                id: 7,
+                name: "Dell UltraSharp U2723QE Monitor",
+                price: 14500000,
+                image: "https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?auto=compress&cs=tinysrgb&w=600"
+            },
+            {
+                id: 8,
+                name: "iPad Air 6 M2",
+                price: 16990000,
+                image: "https://images.pexels.com/photos/221185/pexels-photo-221185.jpeg?auto=compress&cs=tinysrgb&w=600"
+            }
+        ];
+
+        // Cart counter variable
+        let cartCount = 0;
+
+        // 2. Currency Formatter (VND)
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        // 3. Render Products Function
+        function renderProducts() {
+            const productList = document.getElementById('product-list');
+            
+            // Clear old content
+            productList.innerHTML = '';
+
+            products.forEach(product => {
+                // Create card container
+                const card = document.createElement('div');
+                card.className = 'product-card';
+
+                // HTML content
+                card.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-title">${product.name}</h3>
+                        <p class="product-price">${formatCurrency(product.price)}</p>
+                        <button class="btn-add" onclick="addToCart('${product.name}')">
+                            Add to Cart
+                        </button>
+                    </div>
+                `;
+
+                // Add to grid
+                productList.appendChild(card);
+            });
+        }
+
+        // 4. Add to Cart Function
+        function addToCart(productName) {
+            // Increase counter
+            cartCount++;
+            
+            // Update header UI
+            document.getElementById('cart-count').textContent = cartCount;
+
+            // Show Toast
+            showToast(`Added <b>${productName}</b> to cart!`);
+        }
+
+        // 5. Toast Notification Function
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = message;
+
+            // Append to container
+            container.appendChild(toast);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // 6. Run render on load
+        window.onload = renderProducts;
+
+    </script>
+</body>
+</html>
